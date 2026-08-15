@@ -4,22 +4,24 @@ import 'package:dittmanga/features/home/domain/models/manga.dart';
 void main() {
   test('Manga.fromJson parses correctly', () {
     final json = {
-      'mal_id': 1,
-      'title': 'Test Manga',
-      'images': {
-        'jpg': {'image_url': 'https://test.com/image.jpg'}
+      'id': '12345',
+      'attributes': {
+        'title': {'en': 'Test Manga'},
+        'tags': [
+          {'attributes': {'name': {'en': 'Action'}}}
+        ],
       },
-      'score': 8.5,
-      'genres': [{'name': 'Action'}],
-      'authors': [{'name': 'Author One'}],
+      'relationships': [
+        {'type': 'cover_art', 'attributes': {'fileName': 'cover.jpg'}},
+        {'type': 'author', 'attributes': {'name': 'Author One'}}
+      ]
     };
 
     final manga = Manga.fromJson(json);
 
-    expect(manga.malId, 1);
+    expect(manga.id, '12345');
     expect(manga.title, 'Test Manga');
-    expect(manga.imageUrl, 'https://test.com/image.jpg');
-    expect(manga.score, 8.5);
+    expect(manga.imageUrl, 'https://uploads.mangadex.org/covers/12345/cover.jpg.256.jpg');
     expect(manga.genres, ['Action']);
     expect(manga.authors, ['Author One']);
   });
