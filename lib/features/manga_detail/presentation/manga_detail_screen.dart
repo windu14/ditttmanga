@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_typography.dart';
@@ -105,6 +106,11 @@ class MangaDetailScreen extends ConsumerWidget {
                   manga.synopsis ?? 'Tidak ada sinopsis.',
                   style: AppTypography.body2.copyWith(height: 1.5),
                 ),
+                const SizedBox(height: AppSpacing.s24),
+
+                Text('Chapters', style: AppTypography.h3),
+                const SizedBox(height: AppSpacing.s8),
+                _buildChapters(context, ref, manga.id),
               ],
             ),
           );
@@ -114,6 +120,37 @@ class MangaDetailScreen extends ConsumerWidget {
           child: Text('Tidak dapat mengambil data.\nCoba lagi.', textAlign: TextAlign.center),
         ),
       ),
+    );
+  }
+
+  Widget _buildChapters(BuildContext context, WidgetRef ref, String mangaId) {
+    final chaptersAsync = ref.watch(mangaChaptersProvider(mangaId));
+    
+    return chaptersAsync.when(
+      data: (chapters) {
+        if (chapters.isEmpty) {
+          return const Text('Tidak ada chapter dalam bahasa Inggris atau Indonesia.');
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: chapters.length,
+          itemBuilder: (context, index) {
+            final chapter = chapters[index];
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('Chapter ${chapter.chapterNumber}'),
+              subtitle: Text(chapter.title ?? 'No title', maxLines: 1, overflow: TextOverflow.ellipsis),
+              trailing: Text(chapter.language.toUpperCase()),
+              onTap: () {
+                context.push('/chapter/${chapter.id}');
+              },
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => const Text('Gagal memuat chapter.'),
     );
   }
 

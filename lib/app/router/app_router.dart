@@ -6,6 +6,7 @@ import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/about/presentation/about_screen.dart';
 import '../../features/manga_detail/presentation/manga_detail_screen.dart';
+import '../../features/manga_reader/presentation/manga_reader_screen.dart';
 import 'scaffold_with_nav_bar.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -48,6 +49,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return MangaDetailScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: '/chapter/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return MangaReaderScreen(chapterId: id);
         },
       ),
     ],

@@ -15,7 +15,7 @@ class MangaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/manga/${manga.malId}'),
+      onTap: () => context.push('/manga/${manga.id}'),
       child: Container(
         width: 120,
         margin: const EdgeInsets.only(right: AppSpacing.s16),

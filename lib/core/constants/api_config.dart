@@ -1,7 +1,7 @@
 class ApiConfig {
   static const primaryBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.jikan.moe/v4',
+    defaultValue: 'https://api.mangadex.org',
   );
 
   static const fallbackBaseUrl = String.fromEnvironment(

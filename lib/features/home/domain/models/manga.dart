@@ -1,5 +1,5 @@
 class Manga {
-  final int malId;
+  final String id;
   final String title;
   final String? titleEnglish;
   final String imageUrl;
@@ -15,7 +15,7 @@ class Manga {
   final List<String> authors;
 
   Manga({
-    required this.malId,
+    required this.id,
     required this.title,
     this.titleEnglish,
     required this.imageUrl,
@@ -32,32 +32,51 @@ class Manga {
   });
 
   factory Manga.fromJson(Map<String, dynamic> json) {
-    final images = json['images']?['jpg'] ?? {};
-    final imageUrl = images['image_url'] ?? '';
+    final attributes = json['attributes'] ?? {};
+    
+    // Extract title (prefer en or romaji)
+    final titleMap = attributes['title'] ?? {};
+    final title = titleMap['en'] ?? titleMap['ja-ro'] ?? titleMap.values.firstOrNull ?? 'Unknown Title';
+    
+    // Extract synopsis
+    final descMap = attributes['description'] ?? {};
+    final synopsis = descMap['en'] ?? descMap.values.firstOrNull;
 
-    final genresList = (json['genres'] as List<dynamic>?)
-            ?.map((e) => e['name'] as String)
-            .toList() ??
-        [];
+    // Extract relationships (cover, author)
+    String coverFileName = '';
+    List<String> authorsList = [];
+    
+    final relationships = json['relationships'] as List<dynamic>? ?? [];
+    for (var rel in relationships) {
+      if (rel['type'] == 'cover_art') {
+        coverFileName = rel['attributes']?['fileName'] ?? '';
+      } else if (rel['type'] == 'author') {
+        final name = rel['attributes']?['name'];
+        if (name != null) authorsList.add(name);
+      }
+    }
 
-    final authorsList = (json['authors'] as List<dynamic>?)
-            ?.map((e) => e['name'] as String)
-            .toList() ??
-        [];
+    final mangaId = json['id'] ?? '';
+    final imageUrl = coverFileName.isNotEmpty 
+        ? 'https://uploads.mangadex.org/covers/$mangaId/$coverFileName.256.jpg' 
+        : '';
+
+    // Extract tags/genres
+    final tags = attributes['tags'] as List<dynamic>? ?? [];
+    final genresList = tags.map((t) {
+      final tagNameMap = t['attributes']?['name'] ?? {};
+      return (tagNameMap['en'] ?? 'Tag').toString();
+    }).toList();
 
     return Manga(
-      malId: json['mal_id'] ?? 0,
-      title: json['title'] ?? 'Unknown',
-      titleEnglish: json['title_english'],
+      id: mangaId,
+      title: title,
+      titleEnglish: titleMap['en'],
       imageUrl: imageUrl,
-      score: (json['score'] as num?)?.toDouble() ?? 0.0,
-      rank: json['rank'],
-      popularity: json['popularity'],
-      status: json['status'],
-      type: json['type'],
-      chapters: json['chapters'],
-      volumes: json['volumes'],
-      synopsis: json['synopsis'],
+      score: 0.0, // MangaDex ratings are on a separate endpoint or statistics
+      status: attributes['status'],
+      type: attributes['originalLanguage'] == 'ja' ? 'Manga' : 'Comic',
+      synopsis: synopsis,
       genres: genresList,
       authors: authorsList,
     );
