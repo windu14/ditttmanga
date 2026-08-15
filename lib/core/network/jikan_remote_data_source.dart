@@ -22,10 +22,9 @@ class JikanRemoteDataSourceImpl implements JikanRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> getLatestManga({int page = 1}) async {
-    final response = await apiClient.get('/manga', queryParameters: {
+    final response = await apiClient.get('/top/manga', queryParameters: {
       'page': page,
-      'order_by': 'start_date',
-      'sort': 'desc',
+      'filter': 'publishing',
     });
     return response.data;
   }
@@ -41,10 +40,9 @@ class JikanRemoteDataSourceImpl implements JikanRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> getPopularManga({int page = 1}) async {
-    final response = await apiClient.get('/manga', queryParameters: {
+    final response = await apiClient.get('/top/manga', queryParameters: {
       'page': page,
-      'order_by': 'popularity',
-      'sort': 'asc', // Actually 1 is most popular, so asc
+      'filter': 'bypopularity',
     });
     return response.data;
   }

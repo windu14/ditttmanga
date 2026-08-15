@@ -31,7 +31,7 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   bool getDohBypass() {
-    return prefs.getBool('doh_bypass') ?? false;
+    return prefs.getBool('doh_bypass') ?? true;
   }
 
   @override
