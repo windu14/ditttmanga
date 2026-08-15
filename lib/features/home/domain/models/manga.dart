@@ -35,12 +35,12 @@ class Manga {
     final attributes = json['attributes'] ?? {};
     
     // Extract title (prefer en or romaji)
-    final titleMap = attributes['title'] ?? {};
-    final title = titleMap['en'] ?? titleMap['ja-ro'] ?? titleMap.values.firstOrNull ?? 'Unknown Title';
+    final titleMap = (attributes['title'] as Map?) ?? {};
+    final title = titleMap['en'] ?? titleMap['ja-ro'] ?? (titleMap.isNotEmpty ? titleMap.values.first : 'Unknown Title');
     
     // Extract synopsis
-    final descMap = attributes['description'] ?? {};
-    final synopsis = descMap['en'] ?? descMap.values.firstOrNull;
+    final descMap = (attributes['description'] as Map?) ?? {};
+    final synopsis = descMap['en'] ?? (descMap.isNotEmpty ? descMap.values.first : null);
 
     // Extract relationships (cover, author)
     String coverFileName = '';
